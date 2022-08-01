@@ -42,7 +42,6 @@ function Home(props) {
 
   async function resendVerificationMail() {
     try {
-      console.log(props);
       await axiosInstance.post("users/resendVerificationMail", props);
       alert("kirim");
     } catch (error) {
@@ -106,7 +105,6 @@ function Home(props) {
 
     function renderUserPosts() {
       const postMap = postContent.map((post) => {
-        console.log(post.postImage);
         return (
           <div
             key={post.post_id}
@@ -286,6 +284,16 @@ function Home(props) {
             }
           >
             New Post
+          </a>
+          <a
+            href="/userLikes"
+            className={
+              editProfileMenu
+                ? "bg-orange-900 hover:bg-orange-500 z-[1] w-[90%] h-[5vh] flex items-center mb-[1vh] rounded-[2vh] justify-center ease-in-out duration-300"
+                : "bg-orange-900 hover:bg-orange-500 -z-[1] w-[90%] h-[0vh] flex items-center mb-[1vh] rounded-[2vh] justify-center ease-in-out duration-300"
+            }
+          >
+            My Likes
           </a>
           <div className="border-t-[0.1vh] h-[8vh] border-cyan-500 flex flex-col items-center justify-end rounded-[4vh] w-[100%] ease-in-out duration-100">
             <div className="flex justify-start items-center w-[100%]">

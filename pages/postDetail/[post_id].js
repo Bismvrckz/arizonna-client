@@ -342,13 +342,13 @@ function postDetail(props) {
               ""
             )}
           </div>
-          <a
-            href="/"
-            className="mt-[2vh] w-[100%] flex justify-end items-center hover:text-cyan-600"
+          <div
+            onClick={() => router.back()}
+            className="mt-[2vh] w-[100%] flex justify-end items-center hover:text-cyan-600 hover:cursor-pointer"
           >
             <FontAwesomeIcon icon="fa-solid fa-arrow-left" />
-            <p className="mx-[0.5vw]">Back to Home</p>
-          </a>
+            <p className="mx-[0.5vw]">Back to previous</p>
+          </div>
         </div>
       </div>
       <div className="w-[98%] h-[98%] bg-black absolute opacity-[.3] rounded-[1vh] z-[1]" />

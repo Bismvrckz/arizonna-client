@@ -9,6 +9,7 @@ function editProfile(props) {
   const { bio, username, createdAt, isVerified, fullname, email, user_avatar } =
     props.user.dataValues;
 
+  const [usernameError, setUsernameError] = useState(false);
   const [changes, setChanges] = useState(false);
   const [avatar, setAvatar] = useState({});
   const [imgSource, setImgSource] = useState(
@@ -42,8 +43,6 @@ function editProfile(props) {
     }
   }, [inputs]);
 
-  console.log(changes);
-
   const handleInputChange = (prop) => (event) => {
     setInputs({ ...inputs, [prop]: event.target.value });
   };
@@ -74,6 +73,9 @@ function editProfile(props) {
       router.replace("/");
     } catch (error) {
       console.log(error.response.data);
+      if (error.response.data.message.includes("Username")) {
+        setUsernameError(true);
+      }
     }
   }
 
@@ -95,7 +97,7 @@ function editProfile(props) {
         config
       );
 
-      console.log({ resSaveUserImage });
+      console.log({ resSaveUserImage, message: "User image saved" });
 
       setPictureIsChanged(false);
     } catch (error) {
@@ -134,6 +136,10 @@ function editProfile(props) {
           </div>
         </div>
         <TextField
+          onFocus={() => {
+            setUsernameError(false);
+          }}
+          error={usernameError}
           onChange={handleInputChange("inputUsername")}
           className="w-[20vw]"
           label="Username"
@@ -141,6 +147,7 @@ function editProfile(props) {
           value={inputs.inputUsername}
           autoComplete="off"
           color="info"
+          helperText={usernameError ? "Username already exist" : ""}
         />
         <TextField
           onChange={handleInputChange("inputFullname")}
@@ -183,7 +190,6 @@ export async function getServerSideProps(context) {
     const session = await getSession({ req: context.req });
 
     if (!session) return { redirect: { destination: "/login" } };
-    // console.log("jalan");
 
     const { accessToken, user_id, username } = session.user;
 
@@ -199,8 +205,6 @@ export async function getServerSideProps(context) {
     };
 
     const res = await axiosInstance.get(`/users/${user_id}`, config);
-
-    // console.log(res);
 
     return { props: { user: res.data, accessToken } };
   } catch (error) {
