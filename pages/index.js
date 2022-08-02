@@ -1,14 +1,24 @@
-import InfiniteScroll from "react-infinite-scroll-component";
-import axiosInstance from "../services/axiosinstance";
-import MenuIcon from "@mui/icons-material/Menu";
-import { getSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import Navbar from "../components/navbar";
+import * as React from "react";
+import { useState } from "react";
 import { Button } from "@mui/material";
+import Navbar from "../components/navbar";
+import MuiAlert from "@mui/material/Alert";
+import { getSession } from "next-auth/react";
+import Snackbar from "@mui/material/Snackbar";
+import MenuIcon from "@mui/icons-material/Menu";
+import axiosInstance from "../services/axiosinstance";
+import InfiniteScroll from "react-infinite-scroll-component";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function Home(props) {
   const { allPost } = props;
   const { allPostLength } = props;
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mainPageContent, setmainPageContent] = useState("Explore");
   const [editProfileMenu, seteditProfileMenu] = useState(false);
   const [collapsedState, setcollapsedState] = useState(true);
@@ -17,6 +27,20 @@ function Home(props) {
   const [offsetState, setOffsetState] = useState(1);
 
   const { userPosts } = props;
+
+  const handleOpenSnackbar = (customMessage, customSeverity) => {
+    setSnackbarSeverity(customSeverity);
+    setSnackbarMessage(customMessage);
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
 
   function editProfileOption() {
     seteditProfileMenu(!editProfileMenu);
@@ -43,7 +67,7 @@ function Home(props) {
   async function resendVerificationMail() {
     try {
       await axiosInstance.post("users/resendVerificationMail", props);
-      alert("kirim");
+      handleOpenSnackbar("Success resend verification", "info");
     } catch (error) {
       console.log({ error });
     }
@@ -80,7 +104,9 @@ function Home(props) {
             <Button
               variant="contained"
               className="font-[montserrat] mt-[1vh]"
-              onClick={resendVerificationMail}
+              onClick={() => {
+                resendVerificationMail();
+              }}
             >
               Resend verification mail
             </Button>
@@ -190,6 +216,25 @@ function Home(props) {
       user_avatar,
     } = props.user?.dataValues;
 
+    if (!isVerified)
+      return (
+        <div className="relative w-[100%] h-[100%] flex items-center justify-center">
+          <div className=" flex flex-col flex items-center justify-center w-[98%] h-[98%]">
+            <p>Please verify your email first.</p>
+            <Button
+              variant="contained"
+              className="font-[montserrat] mt-[1vh]"
+              onClick={() => {
+                resendVerificationMail();
+              }}
+            >
+              Resend verification mail
+            </Button>
+          </div>
+          <div className="bg-gray-500 opacity-[.8] rounded-[1vw] blur-sm absolute w-[98%] h-[98%] -z-[3]" />
+        </div>
+      );
+
     function renderUserPosts() {
       if (!userPosts.length) {
         return (
@@ -235,23 +280,6 @@ function Home(props) {
         </div>
       );
     }
-
-    if (!isVerified)
-      return (
-        <div className="relative w-[100%] h-[100%] flex items-center justify-center">
-          <div className=" flex flex-col flex items-center justify-center w-[98%] h-[98%]">
-            <p>Please verify your email first.</p>
-            <Button
-              variant="contained"
-              className="font-[montserrat] mt-[1vh]"
-              onClick={resendVerificationMail}
-            >
-              Resend verification mail
-            </Button>
-          </div>
-          <div className="bg-gray-500 opacity-[.8] rounded-[1vw] blur-sm absolute w-[98%] h-[98%] -z-[3]" />
-        </div>
-      );
 
     return (
       <div className="flex items-center justify-evenly w-[98%] h-[98%]">
@@ -331,6 +359,19 @@ function Home(props) {
         {mainPageContent == "Explore" ? ExplorePage() : MyProfilePage(props)}
         <div className="bg-gradient-to-r from-teal-900 to-cyan-900 w-[100%] h-[100%] -z-[1] fixed" />
       </div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

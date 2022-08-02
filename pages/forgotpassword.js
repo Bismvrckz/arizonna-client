@@ -1,10 +1,12 @@
 import React from "react";
-import MainLogo from "../../components/mainLogo";
+import MainLogo from "../components/mainLogo";
 import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function ForgotPassword() {
+  const onSendRecoveryMailClick = async () => {};
+
   return (
     <div className="h-[100vh] bg-gradient-to-r from-blue-900 to-green-800 flex justify-start items-center flex-col relative">
       <div className="flex justify-start mt-[10vh] pl-[10vh] w-[30%]">
