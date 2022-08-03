@@ -62,7 +62,7 @@ function userLikes(props) {
           </Link>
         </div>
       </div>
-      <div className="w-[98%] h-[100%] bg-black opacity-[.5] z-[1] absolute rounded-[1vh]" />
+      <div className="w-[98%] h-[100%] bg-black opacity-[.3] z-[1] absolute rounded-[1vh]" />
     </div>
   );
 }

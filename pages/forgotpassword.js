@@ -7,19 +7,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
 
 function ForgotPassword() {
-  const [emailInput, setEmailInput] = useState("");
   const router = useRouter();
+  const [emailInput, setEmailInput] = useState("");
+  const [emailError, setEmailError] = useState(false);
 
   const onSendRecoveryMailClick = async () => {
     try {
-      const resPostPasswordRecovery = await axiosInstance.post(
-        "/users/recoverPassword",
-        { emailInput }
-      );
-      console.log({ resPostPasswordRecovery });
-      alert("Success");
+      await axiosInstance.post("/users/recoverPassword", { emailInput });
+
+      router.replace("/recoverySuccess");
     } catch (error) {
       console.log({ error });
+      if (error.response.data?.message == "User not found") {
+        setEmailError(true);
+      }
     }
   };
 
@@ -31,10 +32,10 @@ function ForgotPassword() {
 
       <img
         src="https://static.vecteezy.com/system/resources/previews/000/690/821/original/blue-mailbox-with-red-flag-and-letters-vector.jpg"
-        className="rounded-[50%] mt-[8vh] w-[15%] z-[2] m-[0vh] opacity-[.8]"
+        className="rounded-[50%] mt-[8vh] w-[15%] z-[3] m-[0vh] opacity-[.8]"
       />
 
-      <div className="w-[30%] z-[3] mt-[-15vh] rounded-[2vh bg-transparent font-[montserrat] flex flex-col items-center justify-center h-[60%] ">
+      <div className="w-[30%] z-[3] mt-[-10vh] font-[montserrat] flex flex-col items-center justify-center h-[60%] ">
         <div className="flex flex-col justify-center w-[80%]">
           <div className="text-[2vw] my-[1vh] font-[500] text-white">
             Forgot password ?
@@ -46,6 +47,7 @@ function ForgotPassword() {
           </p>
 
           <TextField
+            error={emailError}
             onChange={(event) => {
               setEmailInput(event.target.value);
             }}
@@ -55,6 +57,7 @@ function ForgotPassword() {
             label="Email"
             sx={{ m: 0, width: "100%" }}
             variant="outlined"
+            helperText={emailError ? "User not found" : ""}
           />
           <Button
             onClick={onSendRecoveryMailClick}
@@ -71,7 +74,7 @@ function ForgotPassword() {
         Back to Login
       </a>
 
-      <div className="absolute z-[1]  w-[30%] mt-[20vh] rounded-[2vh] opacity-25 bg-black h-[63%]" />
+      <div className="absolute z-[1] w-[30%] mt-[20vh] rounded-[2vh] opacity-25 bg-black h-[70%]" />
     </div>
   );
 }
