@@ -112,7 +112,7 @@ function Login() {
           margin="normal"
           color="info"
           id="outlined-basic"
-          label="Username"
+          label="Username or Email"
           variant="outlined"
           className="w-[95%] "
           autoComplete="off"
