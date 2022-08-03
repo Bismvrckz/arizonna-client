@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
 import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
 import { Button, TextField } from "@mui/material";
-import FilledInput from "@mui/material/FilledInput";
 import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -13,13 +13,28 @@ import FormHelperText from "@mui/material/FormHelperText";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 function resetPassword(props) {
-  console.log(props);
-  const { dataValues } = props.user;
+  console.log({ props });
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [inputs, setInputs] = useState({
-    password: "",
     confirmPassword: "",
+    password: "",
   });
+  const [inputError, setInputError] = useState({
+    confirmPassword: false,
+    password: false,
+  });
+
+  if (!props.user) {
+    return (
+      <div className="w-[100vw] h-[100vh] flex flex-col items-center justify-center bg-gradient-to-r from-teal-900 to-cyan-900 relative">
+        <div className="text-[2rem]">Whoops!</div>
+        <div>InvalidRecoveryToken</div>
+      </div>
+    );
+  }
+
+  const router = useRouter();
 
   const handleChangeInput = (prop) => (event) => {
     setInputs({ ...inputs, [prop]: event.target.value });
@@ -33,20 +48,47 @@ function resetPassword(props) {
     event.preventDefault();
   };
 
+  const { user } = props;
+
   const sendNewPassword = async () => {
     try {
-      alert("Success");
+      if (!inputs.password || !inputs.confirmPassword) return;
+
+      const resUpdatePassword = await axiosInstance.patch(
+        `/users/updatePassword/${user.user_id}`,
+        inputs
+      );
+
+      console.log({ resUpdatePassword });
+
+      router.replace("/successUpdatePassword");
     } catch (error) {
       console.log({ error });
+
+      if (error.response.data?.message) {
+        const { errorType } = error.response.data;
+
+        if (errorType == "password") {
+          setInputError({
+            ...inputError,
+            password: true,
+          });
+          setErrorMessage(error.response.data.message);
+        } else if (errorType == "confirmPassword") {
+          setInputError({
+            ...inputError,
+            confirmPassword: true,
+          });
+          setErrorMessage(error.response.data.message);
+        }
+      }
     }
   };
 
   return (
     <div className="w-[100vw] h-[100vh] flex flex-col items-center justify-center bg-gradient-to-r from-teal-900 to-cyan-900 relative">
       <div className="w-[30vw] h-[50vh] rounded-[1vh] z-[2] flex flex-col items-center">
-        <p className="text-[1.5rem] font-[500] mt-[6vh]">
-          Hi, {dataValues.username}
-        </p>
+        <p className="text-[1.5rem] font-[500] mt-[6vh]">Hi, {user.username}</p>
         <p className="text-gray-300 font-[300]">
           Insert your new password here,
         </p>
@@ -58,10 +100,17 @@ function resetPassword(props) {
             Password
           </InputLabel>
           <OutlinedInput
+            error={inputError.password}
             id="outlined-adornment-password"
             type={showPassword ? "text" : "password"}
             value={inputs.password}
             onChange={handleChangeInput("password")}
+            onFocus={() => {
+              setInputError({
+                ...inputError,
+                password: false,
+              });
+            }}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -76,13 +125,23 @@ function resetPassword(props) {
             }
             label="Password"
           />
-          <FormHelperText className="text-red-600">password</FormHelperText>
+          <FormHelperText className="text-red-600">
+            {inputError.password ? errorMessage : ""}
+          </FormHelperText>
         </FormControl>
         <TextField
+          error={inputError.confirmPassword}
           onChange={handleChangeInput("confirmPassword")}
           type={"password"}
           label="Confirm new password"
           className="w-[80%] my-[.5vh]"
+          onFocus={() => {
+            setInputError({
+              ...inputError,
+              confirmPassword: false,
+            });
+          }}
+          helperText={inputError.confirmPassword ? errorMessage : ""}
         />
         <Button
           onClick={sendNewPassword}
@@ -115,8 +174,6 @@ export async function getServerSideProps(context) {
     const config = {
       headers: { Authorization: `Bearer ${accessToken}` },
     };
-
-    const test = 123;
 
     const resGetUser = await axiosInstance.get("/users/userWithToken", config);
 

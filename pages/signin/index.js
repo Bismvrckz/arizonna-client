@@ -169,10 +169,10 @@ function Login() {
             {inputError.errorType == "password" ? inputError.message : ""}
           </FormHelperText>
         </FormControl>
-        <div className="flex items-center text-white self-start h-[2rem] mt-[2vh]">
+        {/* <div className="flex items-center text-white self-start h-[2rem] mt-[2vh]">
           <Checkbox color="info" defaultChecked />
           <p>Remember me</p>
-        </div>
+        </div> */}
         <div className="mb-[4vh]" />
         {click ? (
           <LoadingButton

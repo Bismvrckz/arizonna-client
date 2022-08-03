@@ -19,10 +19,10 @@ function recoverySuccess() {
 
   return (
     <div className="w-[100vw] h-[100vh] flex flex-col items-center justify-start bg-gradient-to-r from-blue-900 to-green-800 relative">
-      <div className="mt-[8vh] mb-[7vh] ml-[-17vw]">
+      <div className="mt-[8vh] ml-[-17vw]">
         <MainLogo />
       </div>
-      <div className="flex flex-col z-[2] justify-center items-center">
+      <div className="w-[35%] h-[30%] rounded-[1vh] flex flex-col z-[2] justify-center items-center">
         <img
           src="https://cdn2.vectorstock.com/i/thumb-large/93/46/paper-plane-icon-set-origami-vector-28489346.jpg"
           className="rounded-[50%] w-[15vw] h-[15vw]"
@@ -39,7 +39,7 @@ function recoverySuccess() {
           </a>
         </div>
       </div>
-      <div className="w-[35%] h-[70%] z-[1] absolute bg-black opacity-[.4] rounded-[1vh] mt-[15vh]" />
+      <div className="w-[35%] h-[30%] z-[1] absolute bg-black opacity-[.4] rounded-[1vh] mt-[15.5vh]" />
     </div>
   );
 }

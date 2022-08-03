@@ -10,7 +10,7 @@ function verificationSent() {
       </div>
       <div className="flex grow flex-col w-full items-center justify-start z-[2]">
         <img
-          className="rounded-[50%] w-[10vw] mt-[20vh]"
+          className="rounded-[50%] w-[10vw] mt-[25vh]"
           src="https://png.pngtree.com/png-vector/20220521/ourmid/pngtree-mail-question-gradient-linear-vector-icon-png-image_4683487.png"
         />
         <p className="text-[2rem] font-[600] text-blue-400">
