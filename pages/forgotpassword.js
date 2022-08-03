@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
+import { Button } from "@mui/material";
 import MainLogo from "../components/mainLogo";
 import TextField from "@mui/material/TextField";
-import { Button } from "@mui/material";
+import axiosInstance from "../services/axiosinstance";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRouter } from "next/router";
 
 function ForgotPassword() {
-  const onSendRecoveryMailClick = async () => {};
+  const [emailInput, setEmailInput] = useState("");
+  const router = useRouter();
+
+  const onSendRecoveryMailClick = async () => {
+    try {
+      const resPostPasswordRecovery = await axiosInstance.post(
+        "/users/recoverPassword",
+        { emailInput }
+      );
+      console.log({ resPostPasswordRecovery });
+      alert("Success");
+    } catch (error) {
+      console.log({ error });
+    }
+  };
 
   return (
     <div className="h-[100vh] bg-gradient-to-r from-blue-900 to-green-800 flex justify-start items-center flex-col relative">
@@ -30,6 +46,9 @@ function ForgotPassword() {
           </p>
 
           <TextField
+            onChange={(event) => {
+              setEmailInput(event.target.value);
+            }}
             color="info"
             autoComplete="off"
             id="outlined-basic"
@@ -37,8 +56,12 @@ function ForgotPassword() {
             sx={{ m: 0, width: "100%" }}
             variant="outlined"
           />
-          <Button className="w-[100%] h-[7vh] my-[1vh]" variant="contained">
-            <p className="text-[2vh]">Send reset instructions</p>
+          <Button
+            onClick={onSendRecoveryMailClick}
+            className="w-[100%] h-[7vh] my-[1vh]"
+            variant="contained"
+          >
+            Send reset instructions
           </Button>
         </div>
       </div>
