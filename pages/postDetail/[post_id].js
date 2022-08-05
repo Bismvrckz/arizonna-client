@@ -15,14 +15,20 @@ function postDetail(props) {
   const { postDetail } = props;
   const { accessToken } = props;
   const { user_id, post_id } = props;
-  const [liked, setLiked] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [commentInput, setCommentInput] = useState("");
-  const [commentsOffset, setCommentsOffset] = useState(1);
-  const [comments, setComments] = useState(postDetail.postComments);
+  const { fullCommentsLength } = props;
+  const [commentAlert, setCommentAlert] = useState({
+    isShowed: false,
+    message: "",
+  });
+  const [showMoreCommentClicked, setShowMoreCommentClicked] = useState(false);
   const [likesCount, setLikesCount] = useState(postDetail.postLikes.length);
+  const [comments, setComments] = useState(postDetail.postComments);
+  const [commentsOffset, setCommentsOffset] = useState(1);
+  const [commentInput, setCommentInput] = useState("");
   const [postOwner, setPostOwner] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [liked, setLiked] = useState(false);
 
   const router = useRouter();
   const open = Boolean(anchorEl);
@@ -70,7 +76,6 @@ function postDetail(props) {
     const { post_id } = props;
 
     const body = {
-      commentLimit: 5,
       commentOffset: commentsOffset * 5,
     };
 
@@ -136,17 +141,19 @@ function postDetail(props) {
     try {
       if (!commentInput) return;
 
+      if (commentInput.length > 300)
+        return setCommentAlert({
+          isShowed: true,
+          message: "Max 300 character",
+        });
+
       const config = {
         headers: { Authorization: `Bearer ${accessToken}` },
       };
 
       const body = { postDetail, userData, commentInput };
 
-      const resPostComments = await axiosInstance.post(
-        "/comments",
-        body,
-        config
-      );
+      await axiosInstance.post("/comments", body, config);
 
       setComments([
         {
@@ -306,19 +313,24 @@ function postDetail(props) {
                     </p>
                   </div>
                 </Box>
-
-                {/* <div className="absolute bg-[#242424] top-[50%] left-[50%] w-[12vw] h-[7vh]"></div> */}
               </Modal>
             </div>
           </div>
-          <div className="w-[100%] flex">
+          <div className="w-[100%] flex h-[6vh]">
             <TextField
+              error={commentAlert.isShowed}
               onChange={onCommentInputChange}
               value={commentInput}
               sx={{ width: "75%" }}
               variant="outlined"
               label="Add a comment"
               autoComplete="off"
+              helperText={commentAlert.isShowed ? commentAlert.message : ""}
+              onFocus={() => {
+                setCommentAlert({
+                  isShowed: false,
+                });
+              }}
             />
             <Button
               onClick={onClickAddComment}
@@ -334,8 +346,14 @@ function postDetail(props) {
             ) : (
               <p className="mt-[3vh]">"Nobody has commented yet."</p>
             )}
-            {comments.length == 5 ? (
-              <Button onClick={getMoreComments} variant="text">
+            {fullCommentsLength > 5 && !showMoreCommentClicked ? (
+              <Button
+                onClick={() => {
+                  getMoreComments();
+                  setShowMoreCommentClicked(true);
+                }}
+                variant="text"
+              >
                 See more
               </Button>
             ) : (
@@ -395,9 +413,18 @@ export async function getServerSideProps(context) {
     );
 
     const poster = resGetPostUser.data.dataValues;
+    const fullCommentsLength = resGetPostDetail.data.fullCommentsLength.length;
 
     return {
-      props: { accessToken, user_id, postDetail, userData, poster, post_id },
+      props: {
+        accessToken,
+        user_id,
+        postDetail,
+        userData,
+        poster,
+        post_id,
+        fullCommentsLength,
+      },
     };
   } catch (error) {
     console.log({ error });
