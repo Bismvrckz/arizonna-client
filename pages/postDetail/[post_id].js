@@ -77,7 +77,7 @@ function postDetail(props) {
 
     const body = {
       commentOffset: commentsOffset * 5,
-      commentLimit: 9999,
+      commentLimit: fullCommentsLength - 5,
     };
 
     const resGetPostComments = await axiosInstance.post(
