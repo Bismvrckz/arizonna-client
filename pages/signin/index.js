@@ -60,7 +60,7 @@ function Login() {
       });
 
       if (!res?.error) {
-        router.replace("/afterSignIn");
+        router.replace("/");
       } else {
         console.log(res.error);
         setinputError({

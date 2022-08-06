@@ -77,6 +77,7 @@ function postDetail(props) {
 
     const body = {
       commentOffset: commentsOffset * 5,
+      commentLimit: 9999,
     };
 
     const resGetPostComments = await axiosInstance.post(
@@ -84,6 +85,8 @@ function postDetail(props) {
       body,
       config
     );
+
+    console.log({ resGetPostComments });
 
     const moreComment = resGetPostComments.data.detail[0].postComments;
 
